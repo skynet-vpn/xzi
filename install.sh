@@ -48,7 +48,7 @@ run_silent() {
 
 clear
 echo -e "${BOLD}ZiVPN UDP Installer${RESET}"
-echo -e "${GRAY}ANSENDANTZIVPN Edition${RESET}"
+echo -e "${GRAY}SKYNET VPN Edition${RESET}"
 echo ""
 
 # =========================
@@ -115,7 +115,7 @@ echo "$api_key" > /etc/zivpn/apikey
 # CONFIG
 # =========================
 run_silent "Downloading config" \
-"wget -q https://raw.githubusercontent.com/myridwan/xzi/ipuk/config.json \
+"wget -q https://raw.githubusercontent.com/kyt-team/xzi/main/config.json \
 -O /etc/zivpn/config.json"
 
 # =========================
@@ -123,7 +123,7 @@ run_silent "Downloading config" \
 # =========================
 run_silent "Generating SSL certificate" \
 "openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 \
--subj '/C=ID/ST=JawaBarat/L=Bandung/O=MyRidwan/OU=IT/CN=$domain' \
+-subj '/C=ID/ST=JawaBarat/L=Bandung/O=Skynetvpn/OU=IT/CN=$domain' \
 -keyout /etc/zivpn/zivpn.key -out /etc/zivpn/zivpn.crt"
 
 sysctl -w net.core.rmem_max=16777216 &>/dev/null
@@ -154,9 +154,9 @@ EOF
 mkdir -p /etc/zivpn/api
 
 run_silent "Downloading API source" \
-"wget -q https://raw.githubusercontent.com/myridwan/xzi/ipuk/zivpn-api.go \
+"wget -q https://raw.githubusercontent.com/kyt-team/xzi/main/zivpn-api.go \
 -O /etc/zivpn/api/zivpn-api.go && \
-wget -q https://raw.githubusercontent.com/myridwan/xzi/ipuk/go.mod \
+wget -q https://raw.githubusercontent.com/kyt-team/xzi/main/go.mod \
 -O /etc/zivpn/api/go.mod"
 
 cd /etc/zivpn/api
@@ -195,7 +195,7 @@ if [[ -n "$bot_token" && -n "$admin_id" ]]; then
   echo "{\"bot_token\":\"$bot_token\",\"admin_id\":$admin_id}" > /etc/zivpn/bot-config.json
 
   run_silent "Downloading Bot source" \
-  "wget -q https://raw.githubusercontent.com/myridwan/xzi/ipuk/zivpn-bot.go \
+  "wget -q https://raw.githubusercontent.com/kyt-team/xzi/main/zivpn-bot.go \
   -O /etc/zivpn/api/zivpn-bot.go"
 
   go get github.com/go-telegram-bot-api/telegram-bot-api/v5 &>/dev/null
