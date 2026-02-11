@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # ==================================================
-# ZiVPN UDP Installer — MyRidwan Edition
+# ZiVPN UDP Installer — Skynet Edition
 # ==================================================
 
 set -e
