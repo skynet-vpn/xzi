@@ -88,15 +88,19 @@ done
 echo ""
 
 # =========================
-# API KEY
+# API KEY Configuration
 # =========================
 echo -e "${BOLD}API Key Configuration${RESET}"
-generated_key=$(openssl rand -hex 16)
-echo -e "Generated Key: ${CYAN}$generated_key${RESET}"
-read -rp "Enter API Key (Enter = use generated): " input_key
-api_key="${input_key:-$generated_key}"
-echo -e "Using Key: ${GREEN}$api_key${RESET}"
+
+RANDOM_PART=$(openssl rand -hex 16)
+api_key="skynetvpn_${RANDOM_PART}"
+
+
+echo -e "Generated Key: ${GREEN}$api_key${RESET}"
 echo ""
+
+systemctl stop zivpn.service &>/dev/null || true
+
 
 systemctl stop zivpn.service &>/dev/null || true
 
