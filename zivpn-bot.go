@@ -653,7 +653,7 @@ func showMainMenu(bot *tgbotapi.BotAPI, chatID int64) {
         }
     }
 
-    msgText := fmt.Sprintf("✨ *WELCOME TO BOT ANSENDANT UDP ZIVPN*\n\n"+
+    msgText := fmt.Sprintf("✨ *WELCOME TO BOT SKYNET UDP ZIVPN*\n\n"+
         "• 🖥️ *Server Info:*\n"+
         "• 🌐 *Domain*: `%s`\n"+
         "• 📍 *Lokasi*: `%s`\n"+
@@ -663,7 +663,7 @@ func showMainMenu(bot *tgbotapi.BotAPI, chatID int64) {
         "• ⏳ *Bot Status:*\n"+
         "• 🕒 *Uptime*: %s\n"+
         "• ⚠️ *VPS Exp*: %s\n\n"+
-        "• 🧑‍💻 *Hubungi @kytxz untuk bantuan*",
+        "• 🧑‍💻 *Hubungi @Alvi_cell untuk bantuan*",
         domain, ipInfo.City, ipInfo.Isp, totalUsers, notifStatus, uptimeStr, vpsInfo)
 
     deleteLastMessage(bot, chatID)
