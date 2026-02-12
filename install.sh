@@ -48,7 +48,7 @@ run_silent() {
 
 clear
 echo -e "${BOLD}ZiVPN UDP Installer${RESET}"
-echo -e "${GRAY}ANSENDANTZIVPN Edition${RESET}"
+echo -e "${GRAY}skynet VPN Edition${RESET}"
 echo ""
 
 # =========================
