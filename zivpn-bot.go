@@ -40,6 +40,21 @@ var ApiKey = "AutoFtBot-agskjgdvsbdreiWG1234512SDKrqw"
 
 var startTime time.Time // Global variable untuk menghitung uptime bot
 
+// WIB Timezone (UTC+7)
+var wibLoc *time.Location
+
+func init() {
+	var err error
+	wibLoc, err = time.LoadLocation("Asia/Jakarta")
+	if err != nil {
+		log.Fatal("Gagal load timezone WIB:", err)
+	}
+}
+
+func getNowWIB() time.Time {
+	return time.Now().In(wibLoc)
+}
+
 type BotConfig struct {
 	BotToken       string `json:"bot_token"`
 	AdminID        int64  `json:"admin_id"`
@@ -927,7 +942,7 @@ func performAutoBackup(bot *tgbotapi.BotAPI, adminID int64) {
 
 	doc := tgbotapi.NewDocument(adminID, tgbotapi.FilePath(filePath))
 	doc.Caption = fmt.Sprintf("💾 *AUTO BACKUP REPORT*\n📅 Waktu: `%s`\n📁 Ukuran: %.2f MB\n📂 Lokasi: `%s`",
-		time.Now().Format("2006-01-02 15:04:05"),
+		getNowWIB().Format("2006-01-02 15:04:05"),
 		float64(fileInfo.Size())/1024/1024,
 		filePath)
 	doc.ParseMode = "Markdown"
@@ -970,7 +985,8 @@ func performManualBackup(bot *tgbotapi.BotAPI, chatID int64) {
 	log.Println("✅ [DEBUG] Mencoba mengirim file ke Telegram...")
 
 	doc := tgbotapi.NewDocument(chatID, tgbotapi.FilePath(filePath))
-	doc.Caption = fmt.Sprintf("💾 *Backup Data User*\n📁 Ukuran: %.2f MB\n📂 Lokasi: `%s`",
+	doc.Caption = fmt.Sprintf("💾 *Backup Data User (Waktu: %s)*\n📁 Ukuran: %.2f MB\n📂 Lokasi: `%s`",
+		getNowWIB().Format("2006-01-02 15:04:05"),
 		float64(fileInfo.Size())/1024/1024,
 		filePath)
 	doc.ParseMode = "Markdown"
