@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -37,11 +38,12 @@ type Config struct {
 type UserRequest struct {
 	Password string `json:"password"`
 	Days     int    `json:"days"`
+	Duration string `json:"duration"`
 }
 
 type Response struct {
-	Success bool   `json:"success"`
-	Message string `json:"message"`
+	Success bool        `json:"success"`
+	Message string      `json:"message"`
 	Data    interface{} `json:"data,omitempty"`
 }
 
@@ -95,8 +97,8 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if req.Password == "" || req.Days <= 0 {
-		jsonResponse(w, http.StatusBadRequest, false, "Password dan days harus valid", nil)
+	if req.Password == "" || (req.Days <= 0 && strings.TrimSpace(req.Duration) == "") {
+		jsonResponse(w, http.StatusBadRequest, false, "Password dan days/duration harus valid", nil)
 		return
 	}
 
@@ -122,9 +124,39 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	expDate := time.Now().Add(time.Duration(req.Days) * 24 * time.Hour).Format("2006-01-02")
+	// Calculate expiry time based on either Duration (preferred) or Days
+	var expiry time.Time
+	durStr := strings.TrimSpace(req.Duration)
+	if durStr != "" {
+		// Support "Nd" for days and standard Go duration strings like "1h"
+		if strings.HasSuffix(durStr, "d") {
+			n, err := strconv.Atoi(strings.TrimSuffix(durStr, "d"))
+			if err != nil {
+				jsonResponse(w, http.StatusBadRequest, false, "Format duration tidak valid", nil)
+				return
+			}
+			expiry = time.Now().Add(time.Duration(n*24) * time.Hour)
+		} else {
+			parsed, err := time.ParseDuration(durStr)
+			if err != nil {
+				jsonResponse(w, http.StatusBadRequest, false, "Format duration tidak valid", nil)
+				return
+			}
+			expiry = time.Now().Add(parsed)
+		}
+	} else {
+		expiry = time.Now().Add(time.Duration(req.Days) * 24 * time.Hour)
+	}
+
+	// Choose format: if duration provided in hours (not full days) include time component
+	var expDate string
+	if durStr != "" && !strings.HasSuffix(durStr, "d") {
+		expDate = expiry.Format("2006-01-02 15:04:05")
+	} else {
+		expDate = expiry.Format("2006-01-02")
+	}
 	entry := fmt.Sprintf("%s | %s\n", req.Password, expDate)
-	
+
 	f, err := os.OpenFile(UserDB, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		jsonResponse(w, http.StatusInternalServerError, false, "Gagal membuka database user", nil)
@@ -258,14 +290,42 @@ func renewUser(w http.ResponseWriter, r *http.Request) {
 				// Jika format tanggal salah, anggap hari ini
 				currentExp = time.Now()
 			}
-			
+
 			// Jika sudah expired, mulai dari hari ini. Jika belum, tambah dari tanggal expired.
 			if currentExp.Before(time.Now()) {
 				currentExp = time.Now()
 			}
 
-			newExp := currentExp.Add(time.Duration(req.Days) * 24 * time.Hour)
-			newExpDate = newExp.Format("2006-01-02")
+			// determine extension duration: prefer Duration if provided
+			durStr := strings.TrimSpace(req.Duration)
+			var addDur time.Duration
+			if durStr != "" {
+				if strings.HasSuffix(durStr, "d") {
+					n, err := strconv.Atoi(strings.TrimSuffix(durStr, "d"))
+					if err != nil {
+						jsonResponse(w, http.StatusBadRequest, false, "Format duration tidak valid", nil)
+						return
+					}
+					addDur = time.Duration(n*24) * time.Hour
+				} else {
+					parsed, err := time.ParseDuration(durStr)
+					if err != nil {
+						jsonResponse(w, http.StatusBadRequest, false, "Format duration tidak valid", nil)
+						return
+					}
+					addDur = parsed
+				}
+			} else {
+				addDur = time.Duration(req.Days) * 24 * time.Hour
+			}
+
+			newExp := currentExp.Add(addDur)
+			// if Duration was provided as hours, store full timestamp, otherwise store date only
+			if durStr != "" && !strings.HasSuffix(durStr, "d") {
+				newExpDate = newExp.Format("2006-01-02 15:04:05")
+			} else {
+				newExpDate = newExp.Format("2006-01-02")
+			}
 			newUsers = append(newUsers, fmt.Sprintf("%s | %s", req.Password, newExpDate))
 		} else {
 			newUsers = append(newUsers, line)
