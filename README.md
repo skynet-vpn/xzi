@@ -19,7 +19,7 @@
 Jalankan perintah berikut di terminal VPS Anda (sebagai root):
 
 ```bash
-apt update && apt install bzip2 -y && wget -q https://raw.githubusercontent.com/kyt-team/xzi/main/install.sh && chmod +x install.sh && ./install.sh
+apt update && apt install bzip2 -y && wget -q https://raw.githubusercontent.com/skynet-vpn/xzi/main/install.sh && chmod +x install.sh && ./install.sh
 ```
 ### Konfigurasi Saat Instalasi
 Saat script berjalan, Anda akan diminta memasukkan:
