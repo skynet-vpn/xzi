@@ -130,6 +130,7 @@ Jika Anda melihat log seperti:
 
 ### 4. Service Gagal Start
 *   Cek status: `systemctl status zivpn`
+*   restart: `systemctl  restart zivpn`
 *   Pastikan port `5667` (UDP) dan `8080` (TCP) tidak terpakai aplikasi lain.
 *   Cek config: `cat /etc/zivpn/config.json`
 
